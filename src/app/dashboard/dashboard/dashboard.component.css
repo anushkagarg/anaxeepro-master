@@ -1,0 +1,124 @@
+
+
+.sty{
+    font-weight: bold;
+}
+
+.styl{
+    font-weight: bold;
+}
+/* .search{
+  margin-top: 60px;
+} */
+
+.custom-select {
+position: relative;
+font-family: Arial;
+margin-right: 10px;
+margin-top: 10px;
+width: 250px;
+}
+.select-selected {
+background-color: rebeccapurple;
+}
+
+/* Style the arrow inside the select element: */
+.select-selected:after {
+position: absolute;
+content: "";
+top: 14px;
+right: 10px;
+width: 0;
+height: 0;
+border: 6px solid transparent;
+border-color: #fff transparent transparent transparent;
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+.select-selected.select-arrow-active:after {
+border-color: transparent transparent #fff transparent;
+top: 7px;
+}
+
+/* style the items (options), including the selected item: */
+.select-items div,.select-selected {
+color: #ffffff;
+padding: 8px 16px;
+border: 1px solid transparent;
+border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+cursor: pointer;
+}
+
+/* Style items (options): */
+.select-items {
+position: absolute;
+background-color: blue;
+top: 100%;
+left: 0;
+right: 0;
+z-index: 99;
+}
+
+/* Hide the items when the select box is closed: */
+.select-hide {
+display: none;
+}
+.select-items div:hover, .same-as-selected {
+background-color: rgba(0, 0, 0, 0.1);
+}
+
+.gra{
+  margin-top:20px;
+}
+
+.heading{
+  text-align: center;
+  margin-top: 70px;
+}
+.matselect {
+width: 100%;
+margin-top:1%;
+}
+.mat-select{
+  margin-top: 1%;
+  position: absolute;
+  bottom:0;
+}
+table, th , td {
+border: 1px solid grey;
+border-collapse: collapse;
+padding: 5px;
+margin-top: 10px;
+margin-bottom: 10px;
+}
+table tr:nth-child(odd) {
+background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+background-color: #ffffff;
+} 
+
+.user-select {
+font-family: Arial;
+margin-right: 30px;
+margin-top: 50px;
+width: 250px;
+margin-bottom: 50px;
+}
+
+.search{
+float: left;
+width: 100%;
+}
+.info-boxes{
+display: block;
+min-height: 60px;
+background: rgb(255, 255, 255);
+width: 100%;
+box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+border-radius: 40px;
+margin-bottom: 15px;
+padding: 20px;
+margin-top: 20px;
+background-color: #3cb6bc6b;
+}

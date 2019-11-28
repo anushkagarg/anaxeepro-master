@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.3.0/firebase-firestore.js"></script>
+    <body >
+      <div>
+      <div class="wrapper">
+     <app-topnavbar></app-topnavbar>
+     <app-asidenavbar></app-asidenavbar>
+        <div class="content-wrapper">
+          <section class="content-header">
+            <section class="content">
+              <section class="content-header">
+                <h1>Call Log Report</h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li class="active">Dashboard</li>
+                  </ol>
+              </section>
+                  <br>
+                  <div class="row">
+                
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box">
+                          <span class="info-box-icon bg-maroon"><i class="material-icons">
+                            settings_cell
+                            </i></span>
+                          <div class="info-box-content">
+                            <span class="info-box-text">Total Calls Count</span>
+                            <span class="info-box-number">{{total}}</span>
+                          </div>
+                          <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-xs-12">
+                          <div class="info-box">
+                            <span class="info-box-icon bg-teal"><i class="material-icons">
+                              settings_phone
+                              </i></span>
+                            <div class="info-box-content">
+                              <span class="info-box-text">Total Unique Calls</span>
+                              <span class="info-box-number">{{unique}}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                          </div>
+                          <!-- /.info-box -->
+                        </div> 
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="info-box">
+                              <span class="info-box-icon bg-purple"><i class="material-icons">
+                                phone_in_talk
+                                </i></span>
+                              <div class="info-box-content">
+                                <span class="info-box-text">Total productive calls </span>
+                                <span class="info-box-number">{{productive}}</span>
+                              </div>
+                              <!-- /.info-box-content -->
+                            </div>
+                            <!-- /.info-box -->
+                          </div>
+                           <div class="col-md-3 col-sm-6 col-xs-12">
+                              <div class="info-box">
+                                <span class="info-box-icon bg-fuchsia"><i class="material-icons">
+                                  contact_phone
+                                  </i></span>
+                                <div class="info-box-content">
+                                  <span class="info-box-text">Total Call Length</span>
+                                  <span class="info-box-number">{{totalCallLength}}</span>
+                                </div>
+                                <!-- /.info-box-content -->
+                              </div>
+                              </div>
+    
+                              <!-- /.info-box -->
+                              <div class="col-md-3 col-sm-6 col-xs-12">
+                                  <div class="info-box">
+                                    <span class="info-box-icon bg-aqua"><i class="material-icons">
+                                      phone_callback
+                                      </i></span>
+                                    <div class="info-box-content">
+                                      <span class="info-box-text">Incoming Calls Count</span>
+                                      <span class="info-box-number">{{inco}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                  </div>
+                                  <!-- /.info-box -->
+                                </div>
+                                <div class="col-md-3 col-sm-6 col-xs-12">
+                                    <div class="info-box">
+                                      <span class="info-box-icon bg-red"><i class="material-icons">
+                                        phone_forwarded
+                                        </i></span>
+                              
+                                      <div class="info-box-content">
+                                        <span class="info-box-text">Outgoing Calls Count</span>
+                                        <span class="info-box-number">{{outg}}</span>
+                                      </div>
+                                      <!-- /.info-box-content -->
+                                    </div>
+                                    <!-- /.info-box -->
+                                  </div>
+                                  <div class="clearfix visible-sm-block"></div>
+                      
+                                  <div class="col-md-3 col-sm-6 col-xs-12">
+                                    <div class="info-box">
+                                      <span class="info-box-icon bg-green"><i class="material-icons">
+                                        phone_disabled
+                                        </i></span>
+                              
+                                      <div class="info-box-content">
+                                        <span class="info-box-text">Missed Calls Count</span>
+                                        <span class="info-box-number">{{miss}}</span>
+                                      </div>
+                                      <!-- /.info-box-content -->
+                                    </div>
+                                    <!-- /.info-box -->
+                                  </div>
+                
+                                  <div class="col-md-3 col-sm-6 col-xs-12">
+                                      <div class="info-box">
+                                        <span class="info-box-icon bg-yellow"><i class="material-icons">
+                                          phonelink_erase
+                                          </i></span>
+                                
+                                        <div class="info-box-content">
+                                          <span class="info-box-text">Rejected Calls Count</span>
+                                          <span class="info-box-number">{{rejc}}</span>
+                                        </div>
+                                        <!-- /.info-box-content -->
+                                      </div>
+                                      <!-- /.info-box -->
+                                    </div>
+                      </div>
+                      <div class="row">
+                        
+                         <!---<div class="col-md-3 col-sm-6 col-xs-12">
+                              <div class="custom-select info-boxes" >
+                              <label>Selected User</label>
+                              <select id="Topicstoremove" [(ngModel)]="selectedUser" class="form-control custom_select show-tick" multiple size="12">
+                                  <option *ngFor="let user of filteredUser;let i = index" [value]="user">{{user}}</option>
+                              </select>
+                              </div>
+                              
+                            </div> --->
+                            <div class="col-md-3 col-sm-6 col-xs-12">
+                             <mat-form-field class="custom-select info-boxes">
+                                <mat-label>Select User</mat-label>
+                                <mat-select [(ngModel)]="selectedUser" multiple (selectionChange)="filterData()">
+                                  <mat-option *ngFor="let user of filteredUser"  [value]="user">{{user}} </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                             <div class="col-md-3 col-sm-6 col-xs-12">
+                                <div class="custom-select info-boxes" >  
+                                    <label>Number: </label> 
+                                    <br>
+                                     <select [(ngModel)] = "selectedNumber"  (change)="filterData()">
+                                      <option *ngFor="let fromnumber of filteredNumber"  [ngValue]="fromnumber ">{{fromnumber}}
+                                      </option>
+                                    </select>
+                                    </div>
+                                   </div>
+                                   <div class="col-md-3 col-sm-6 col-xs-12">
+                                    <div class=" info-boxes" > 
+                                    <input type="text" matInput
+                                    ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                    startKey="startDate"
+                                    endKey="endDate"
+                                    [(ngModel)]="selectedDaterange"
+                                    (change) = 'filterData()'
+                                    name="daterange"
+                                    placeholder="choose date"/> 
+                                    </div>
+                                  </div>
+
+                                   <div class="col-md-3 col-sm-6 col-xs-12">
+                                      <div class="custom-select info-boxes" >  
+                                          <label>Type:</label>
+                                          <br>
+                                          <select [(ngModel)] = "selectedType" allow-clear="true" (change)="filterData()">
+                                            <option *ngFor="let activity of filteredType"  [ngValue]="activity">{{activity}} 
+                                            </option>
+                                          </select>
+                                        </div>
+          
+                                  </div>
+                                  
+                                </div>
+    
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title">Total Unique contact No</h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      <!-- /.box-header -->
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="chartunique">
+                                            <canvas id="canvasunique">{{ chartunique }}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                          <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                      </div>
+                                    
+                                </div>
+ <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title">Total contact No</h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      <!-- /.box-header -->
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="charttotal">
+                                            <canvas id="canvastotal">{{ charttotal }}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                          <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                      </div>
+                                    
+                                </div>
+
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title"><b>Number of Calls per user</b></h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      <!-- /.box-header -->
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="chartstack">
+                                            <canvas id="canvass">{{ chartstack }}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                          <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                      </div>
+                                    
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title"><b>Miss call graph per user</b></h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      <!-- /.box-header -->
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="chart">
+                                            <canvas id="canvas">{{ chart }}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                          <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                      </div>
+                                    
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title"><b>Top Outgoing Call Performer</b></h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      <!-- /.box-header -->
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="chartoutg">
+                                            <canvas id="canva">{{ chartoutg}}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                          <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                      </div>
+                                    
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title"><b>Number of Calls Per Date</b></h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      <!-- /.box-header -->
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="chartdate">
+                                            <canvas id="canvasdate">{{ chartdate}}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                          <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                      </div>
+                                    
+                                </div>
+
+                                <section class="content">
+                                  <div class="row">
+                                    <div class="col-xs-12">
+                                      
+                            
+                                      <div class="box">
+                                        <div class="box-header">
+                                          <h3 class="box-title">Data Table With All Records </h3>
+                                        </div>
+                                     
+                                        <div class="box-body">
+                                          <div id="example1_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                            <div class="row">
+                                            
+                                                <div class="col-sm-6">
+                                                  <label>Search  : </label>
+                                                    <input type="text" [(ngModel)]="term" placeholder="search....">
+                                                    
+                                                </div>
+                                                
+                                              </div>
+                                              <div class="row">
+                                                <div class="col-sm-12">
+                                                  <table id="example1" class="table table-bordered table-striped dataTable" role="grid" aria-describedby="example1_info">
+                                            <thead>
+                                            <tr role="row">
+                                              
+                                              
+                                              <th class="sorting_asc" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending" aria-sort="ascending" style="width: 182px;">User</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 224px;">ContactName</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending" style="width: 199px;">FromNumber(s)</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending" style="width: 156px;">ToNumber</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Duration(sec)</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Activity</th>
+
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Time</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Date</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">note</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">AudioLink</th>
+
+                                              
+
+
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor= "let post of filteredCalls | paginate: { id: 'listing_pagination',
+                                                itemsPerPage: 10,
+                                                currentPage: page,
+                                                totalItems: totalRec } |filter:term">
+                                                    <td>{{post.User}}</td>
+                                                    <td>{{post.ContactName}}</td>
+                                                    <td>{{post.FromNumber }}</td>
+                                                    <td>{{post.ToNumber}}</td>
+                                                    <td>{{post.CallLength}}</td>
+                                                    <td>{{post.Activity}}</td>
+                                                   <td>{{post.Timestamp*1000 |date: 'h:mm:ss a'}}</td> 
+                                                  <td>{{post.Timestamp*1000 |date:'dd/MM/yyyy' }} </td>
+                                                  <td><button mat-button (click)="openDialog(post.notes)"><i class="material-icons">
+                                                    description
+                                                    </i></button></td>
+                                                    <td>
+                                                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                                          Play
+                                                        </button>
+                                                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                              <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                  <h5 class="modal-title" id="exampleModalLabel">User Recoding</h5>
+                                                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                  </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <audio controls>
+                                                                        <source src=  {{post.url}} />
+                                                                        </audio>
+                                                                      
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                  
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          </div> 
+                                                  </td>
+                                                  <td>
+                                                      <!-- <session-expiration-alert [alertAt]="alertAt" [startTimer]="startTimer"></session-expiration-alert>
+
+                                                      <button (click)="increase()">change alert at</button> {{alertAt}}
+                                                      <br>
+                                                      <button (click)="toggletimer()">toggle timer</button> {{startTimer}}
+                                                      
+                                                      <h2 *ngIf="sessionTimer.remainSeconds$ | async; let time">Session Remains {{time}} seconds.</h2> -->
+                                                  </td>
+                                        
+                                                  </tr>  
+                                            </tbody>
+                                            
+                                          </table></div></div><div class="row">
+                                            
+                                              <div>
+                                                  <pagination-controls  id="listing_pagination" maxSize="5" directionLinks="true" (pageChange)="page = $event"></pagination-controls>
+                                                </div>
+                                          </div>
+                                        </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                      </div>
+                                      <!-- /.box -->
+                                    </div>
+                                    <!-- /.col -->
+                                  </div>
+                                  <!-- /.row -->
+                                </section>
+                              
+  
+         </section>
+    </section>
+</div>
+  </div>
+
+         <app-footernavbar></app-footernavbar> 
+        <app-settingnavbar></app-settingnavbar>  
+      </div> 
+    </body>
+    </html>
+      
+      
+

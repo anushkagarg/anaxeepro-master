@@ -1,0 +1,59 @@
+.login-box{
+    float: right;
+    margin-right: 40px;
+    margin-top: 100px;
+}
+/* .left_image{
+    width: 230px;
+    height: auto;
+    text-align: center;
+    margin-top: 300px;
+    margin-left: 50%;
+} */
+.bannaerCaption {
+    position: absolute;
+    width: 70%;}
+    h6 {
+        font-size: 24px;
+        padding-left: 6%;
+        font-weight: 400;
+        margin-top: 10px;
+        font-family: font-stack-medium;
+        line-height: 36px;
+        letter-spacing: 1px;
+    }
+    h1 {
+        font-size: 76px;
+        color: white;
+        margin-bottom: 15px;
+        padding-left: 6%;
+        letter-spacing: 4px;
+        font-family: font-stack-medium;
+        font-weight: 600;
+    }  
+img{
+    width: 100%;
+    height: auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+ /* .left_image:after {
+    content: '';
+    position: absolute;
+    bottom: -330px;
+    left: -200px;
+    background-repeat: no-repeat;
+    background-image: url(../../../assets/images/04-left-circle.png);
+    background-size: 100%;
+    width: 500px;
+    height: 375px;
+    z-index: 0;
+} */
+
+.main__body .d-none {
+    text-align: center;
+    position: relative;
+    border-right: 1px solid #000;
+}

@@ -1,0 +1,69 @@
+
+
+<div class="main__body">
+    <div class="">
+      <div class="col-lg-8 custom_col_9 d-sm-none d-md-block d-none d-xs-none d-xs-block" >
+        <div class="left_image d-flex flex-column justify-content-center"  >
+            <!-- <div fxFlex="100" class="bannerSideWrapper">  -->
+                <div class="bannaerCaption">
+                  <h1>
+                    Anaxee Digital <br />Runners
+                  </h1>
+                  <h6>
+                    Aims to become biggest last mile network <br />
+                    for data collection across INDIA.
+                  </h6>
+                </div>
+                <img src="./../assets/images/login-side-img.jpg" class="loginSideBanner" />
+              <!-- </div> -->
+          <!-- <ng-image-slider [images]="imageObject" ></ng-image-slider> -->
+      </div>
+      </div>
+      <div class="login__page">
+        <div class="row">
+          <span class="boader-mid"> </span>
+            <div class="card col-lg-4 custom_col_3" >
+                <div class="login-box">
+  
+              <div class="login__card">
+                <div class="card-block">
+                  <div class="login-logo">
+                    <a href="../../index2.html"><b>Anaxee</b></a>
+                  </div>
+                  <p class="login-box-msg">Welcome to Lead Management Tool</p>
+            
+                   <form name="userform" method="post" #formCtrl="ngForm">
+                      <h3 text-align="center">Login Form</h3>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input type="email" class="form-control" [(ngModel)]="email" name="email" placeholder="Email" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" class="form-control" [(ngModel)]="password" name="password" placeholder="Password" required>
+                      </div>
+  
+                      <div class="form-group">
+                          <button type="buton" class="btn btn-primary btn-block" style="margin-bottom: 20px" (click)="signInWithEmail()" [disabled]="formCtrl.form.invalid">
+                            Login with Email
+                          </button>
+                      </div>
+                      
+                      <button type="button" class="btn btn-block , btn-btn-danger" (click)="signInWithGoogle()" color='red'>
+                        <i class="fa fa-google" aria-hidden="true" ></i>
+                        Sign in using Google+
+             </button>
+             </form> 
+             <div class="alert alert-{{responseMessageType}}" role="alert"
+      *ngIf="responseMessage.length">
+      {{responseMessage}}
+    </div>
+               </div>
+                </div>
+                </div>
+             </div>
+           </div>
+         </div>
+      </div>
+   </div>
+                      

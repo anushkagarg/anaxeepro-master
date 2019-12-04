@@ -52,14 +52,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   rejectedCalls: Call[];
   incomingCalls: Call[];
   outgoingCalls: Call[];
-  uniqueCalls: Call[];
-  uniqueOutgoing: Call[];
-  uniqueMissed: Call[];
-  uniqueIncoming: Call[];
-  uniqueRejected: Call[];
   totalCallLength: string;
   timeString; productive; unique; dayString; inco; miss; outg; rejc; total; query: string;
-  uniInco; uniOutg; uniMiss; uniRejc;
+  uniqueInco; uniqueOutg; uniqueMiss; uniqueRejc;
   filteredNumber: string[];
   filteredType: string[];
   term; page: number; totalRec;
@@ -151,28 +146,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log(this.inco, this.outg);
     this.miss = this.missedCalls.length;
     this.rejc = this.rejectedCalls.length;
-    this.unique = this.uniqueCalls.length;
     this.total = this.inco + this.outg + this.miss + this.rejc;
     this.productive = this.filteredCalls.filter(call => call.CallLength >= 10).length;
     let second = this.filteredCalls.reduce((total, call) => total + Number(call.CallLength), 0);
-    console.log(second);
     this.totalCallLength = new Date(second * 1000).toISOString().substr(11, 8);
-    this.uniInco = this.uniqueIncoming.length;
-    this.uniOutg = this.uniqueOutgoing.length;
-    this.uniMiss = this.uniqueMissed.length;
-    this.uniRejc = this.uniqueRejected.length;
   }
   setCallsByType() {
     this.incomingCalls = this.filteredCalls.filter(call => call.Activity === 'Incoming');
     this.outgoingCalls = this.filteredCalls.filter(call => call.Activity === 'Outgoing');
     this.missedCalls = this.filteredCalls.filter(call => call.Activity === 'Missed');
     this.rejectedCalls = this.filteredCalls.filter(call => call.Activity === 'Rejected');
-    this.uniqueCalls = Array.from(new Set(this.filteredCalls.filter(call => call.ToNumber)));
-    this.uniqueOutgoing = this.uniqueCalls.filter(call => call.Activity === 'Outgoing');
-    this.uniqueRejected = this.uniqueCalls.filter(call => call.Activity === 'Rejected');
-    let uni = Array.from(new Set(this.filteredCalls.filter(call => call.FromNumber)));
-    this.uniqueIncoming = uni.filter(call => call.Activity === 'Incoming');
-    this.uniqueMissed = uni.filter(call => call.Activity === 'Missed');
+    this.uniqueOutg =  [...new Set(this.outgoingCalls.map(call => call.ToNumber))].length;
+    this.uniqueInco = [...new Set(this.incomingCalls.map(call => call.FromNumber))].length;
+    this.uniqueMiss = [...new Set(this.missedCalls.map(call => call.FromNumber ))].length;
+    this.uniqueRejc = [...new Set(this.rejectedCalls.map(call => call.ToNumber))].length;
   }
   openDialog(post) {
     console.log('called');
@@ -317,7 +304,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         labels: ['Incoming', 'Outgoing', 'Missed', 'Rejected'],
         datasets: [{
           label: 'Total Calls Count',
-            data: [this.uniInco, this.uniOutg, this.uniMiss, this.uniRejc],
+            data: [this.uniqueInco, this.uniqueOutg, this.uniqueMiss, this.uniqueRejc],
             backgroundColor: [
                 'rgb(204, 51, 153)',
                 'rgb(204, 51, 153)',
@@ -462,6 +449,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   timestampToDate(timestamp) {
    return Moment.unix(timestamp).format('DD/MM/YYYY');
   }
+  reset() {
+    this.filterData();
+  }
+ 
+  /*selectAll(select: NgModel, values, array) {
+    select.update.emit(values); 
+  }
+  deselectAll(select: NgModel) {
+    select.update.emit([]); 
+  }*/
+
   ngOnDestroy(): void {
     document.body.className = '';
   }

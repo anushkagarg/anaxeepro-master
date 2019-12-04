@@ -1,3 +1,27 @@
 .dropdown-menu {
     width: 600px;
 }
+.alert-dismissible{
+    border: 1px solid red ;
+}
+.alert {
+    list-style: none;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    margin-bottom: 1px;
+   
+}
+.text{
+    padding-top: 5px;;
+}
+.drop-sts{
+    max-height: 300px;
+}
+.footerrr{
+    padding:5px 15px;
+    border-radius: 0px 0px 3px 3px; 
+    background-color: #37474F;
+    color: #fff;
+  }
+  

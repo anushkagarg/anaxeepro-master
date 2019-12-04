@@ -23,6 +23,5 @@ export class TopnavbarComponent implements OnInit {
   ngOnInit() {
 
     this.posts = this.afs.collection<Post>('callrecords', ref => ref.where('Activity', '==', 'Missed')).valueChanges();
-    console.log(this.posts);
   }
 }

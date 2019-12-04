@@ -1,14 +1,14 @@
 
 
 .sty{
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .styl{
-    font-weight: bold;
+  font-weight: bold;
 }
 /* .search{
-  margin-top: 60px;
+margin-top: 60px;
 } */
 
 .custom-select {
@@ -68,21 +68,21 @@ background-color: rgba(0, 0, 0, 0.1);
 }
 
 .gra{
-  margin-top:20px;
+margin-top:20px;
 }
 
 .heading{
-  text-align: center;
-  margin-top: 70px;
+text-align: center;
+margin-top: 70px;
 }
 .matselect {
 width: 100%;
 margin-top:1%;
 }
 .mat-select{
-  margin-top: 1%;
-  position: absolute;
-  bottom:0;
+margin-top: 1%;
+
+bottom:0;
 }
 table, th , td {
 border: 1px solid grey;
@@ -110,15 +110,19 @@ margin-bottom: 50px;
 float: left;
 width: 100%;
 }
+.date-s{
+padding-top: 40px !important;
+}
 .info-boxes{
 display: block;
-min-height: 60px;
+min-height: 100px;
 background: rgb(255, 255, 255);
 width: 100%;
 box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 border-radius: 40px;
 margin-bottom: 15px;
 padding: 20px;
+text-align: center;
 margin-top: 20px;
 background-color: #3cb6bc6b;
 }

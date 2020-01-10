@@ -28,7 +28,7 @@
                             </i></span>
                           <div class="info-box-content">
                             <span class="info-box-text">Total Calls Count</span>
-                            <span class="info-box-number">{{total}}</span>
+                            <span class="info-box-number">{{totalCount}}</span>
                           </div>
                           <!-- /.info-box-content -->
                         </div>
@@ -40,7 +40,7 @@
                               settings_phone
                               </i></span>
                             <div class="info-box-content">
-                              <span class="info-box-text">Total Unique Calls</span>
+                              <span class="info-box-text">Unique Outgoing Calls</span>
                               <span class="info-box-number">{{uniqueOutg}}</span>
                             </div>
                             <!-- /.info-box-content -->
@@ -81,7 +81,7 @@
                                       </i></span>
                                     <div class="info-box-content">
                                       <span class="info-box-text">Incoming Calls Count</span>
-                                      <span class="info-box-number">{{inco}}</span>
+                                      <span class="info-box-number">{{incomingCount}}</span>
                                     </div>
                                     <!-- /.info-box-content -->
                                   </div>
@@ -95,7 +95,7 @@
                               
                                       <div class="info-box-content">
                                         <span class="info-box-text">Outgoing Calls Count</span>
-                                        <span class="info-box-number">{{outg}}</span>
+                                        <span class="info-box-number">{{outgoingCount}}</span>
                                       </div>
                                       <!-- /.info-box-content -->
                                     </div>
@@ -111,7 +111,7 @@
                               
                                       <div class="info-box-content">
                                         <span class="info-box-text">Missed Calls Count</span>
-                                        <span class="info-box-number">{{miss}}</span>
+                                        <span class="info-box-number">{{missedCount}}</span>
                                       </div>
                                       <!-- /.info-box-content -->
                                     </div>
@@ -126,7 +126,7 @@
                                 
                                         <div class="info-box-content">
                                           <span class="info-box-text">Rejected Calls Count</span>
-                                          <span class="info-box-number">{{rejc}}</span>
+                                          <span class="info-box-number">{{rejectedCount}}</span>
                                         </div>
                                         <!-- /.info-box-content -->
                                       </div>
@@ -135,28 +135,35 @@
                       </div>
                       <div class="row">
                         
-                        
+                        <input type="button" value="Clear Filters" onClick="window.location.reload()">
                         <div class="col-md-3 col-sm-6 col-xs-12">
                          <mat-form-field class="custom-select info-boxes">
                             <mat-label>Select User</mat-label>
-                            <mat-select [(ngModel)]="selectedUser" multiple (selectionChange)="filterData()"  #yearSelect="ngModel"  >
-                        <button mat-raised-button class="mat-primary fill text-sm" (click)="selectAll(yearSelect, filteredUser)">Select All </button>
+                            <mat-select [(ngModel)]="selectedUser" multiple (selectionChange)="handleSelectedUserChange()"  #yearSelect="ngModel"  >
+                        <!---<button mat-raised-button class="mat-primary fill text-sm" (click)="selectAll(yearSelect, filteredUser)">Select All </button>
                         <button mat-raised-button class="mat-accent fill text-sm" (click)="deselectAll(yearSelect)">
                         Deselect All
-                      </button>
-                        <mat-option *ngFor="let user of filteredUser"  [value]="user">{{user}} </mat-option>
+                      </button> -->
+                        <mat-option *ngFor="let user of localUser"  [value]="user">{{user}} </mat-option>
                             </mat-select>
                           </mat-form-field>
                         </div>
                          <div class="col-md-3 col-sm-6 col-xs-12">
-                            <div class="custom-select info-boxes" >  
-                                <label>Number: </label> 
-                                <br>
-                                 <select [(ngModel)] = "selectedNumber"  (change)="filterData()">
-                                  <option value="">--None--</option> <option *ngFor="let fromnumber of filteredNumber"  [ngValue]="fromnumber ">{{fromnumber}}
-                                  </option>
-                                </select>
-                                </div>
+                            <mat-form-field class="custom-select info-boxes" >  
+                        
+                                <input type="number" [(ngModel)]= "nom" placeholder="search....">
+                                <mat-label>Select Number: </mat-label> 
+                                <!---<mat-option>
+                                  <ngx-mat-select-search ngModel='query' (keyup)="queryChange()"></ngx-mat-select-search>
+                                </mat-option>-->
+                                <!---<input type="text" [(ngModel)]="nom" placeholder="search....">-->
+                                
+                                                    
+                                 <mat-select [(ngModel)] = "selectedNumber" multiple (selectionChange)="handleSelectedNumberChange()">
+                                  <!---<mat-option value="">--None--</mat-option> -->
+                                  <mat-option *ngFor="let number of localNumber |filter:nom"  [value]="number">{{number}}</mat-option>
+                                </mat-select>
+                                </mat-form-field>
                                </div>
                                <div class="col-md-3 col-sm-6 col-xs-12">
                                 <div class=" info-boxes date-s"  > 
@@ -167,12 +174,12 @@
                                 startKey="startDate"
                                 endKey="endDate"
                                 [(ngModel)]="selectedDaterange"
-                                (change) = 'filterData()'
+                                (change) = 'handleSelectedDateChange()'
                                 name="daterange"
                                
                                 placeholder="choose date"/> 
                                 </div>
-                                <button mat-raised-button (click)="reset()">Reset</button>
+                               <!---button mat-raised-button (click)="reset()">Reset</button>-->
 
                               </div>
                               
@@ -181,8 +188,9 @@
                                   <div class="custom-select info-boxes" >  
                                       <label>Type:</label>
                                       <br>
-                                      <select [(ngModel)] = "selectedType" allow-clear="true" (change)="filterData()">
+                                      <select [(ngModel)] = "selectedType" allow-clear="true" (change)="handleSelectedTypeChange()">
                                         <option value="">--None--</option> <option *ngFor="let activity of filteredType"  [ngValue]="activity">{{activity}} 
+                                       
                                         </option>
                                       </select>
                                     </div>
@@ -233,11 +241,14 @@
                           </div>
                                 
 
-                                <div class="row">
+                               
+                                
+                                
+                                <!---<div class="row">
                                   <div class="col-md-12">
                                     <div class="box">
                                       <div class="box-header with-border">
-                                        <h3 class="box-title"><b>Number of Calls per user</b></h3>
+                                        <h3 class="box-title"><b>Number of Calls Per Date</b></h3>
                           
                                         <div class="box-tools pull-right">
                                           <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -256,18 +267,56 @@
                                           <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
                                         </div>
                                       </div>
-                                      <!-- /.box-header -->
+                                  
                                       <div class="box-body">
                                         <div class="row">
-                                          <div *ngIf="chartstack">
-                                            <canvas id="canvass">{{ chartstack }}</canvas>
+                                          <div *ngIf="chartdate">
+                                            <canvas id="canvasdate">{{ chartdate}}</canvas>
                                           </div>
                                           </div>
                                           
                                           </div>
-                                          <!-- /.col -->
+                                    
                                         </div>
-                                        <!-- /.row -->
+                                
+                                      </div>
+                                    
+                                </div> -->
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="box">
+                                      <div class="box-header with-border">
+                                        <h3 class="box-title"><b>Top Outgoing Call Performer</b></h3>
+                          
+                                        <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                          </button>
+                                          <div class="btn-group">
+                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                              <i class="fa fa-wrench"></i></button>
+                                            <ul class="dropdown-menu" role="menu">
+                                              <li><a href="#">Action</a></li>
+                                              <li><a href="#">Another action</a></li>
+                                              <li><a href="#">Something else here</a></li>
+                                              <li class="divider"></li>
+                                              <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                          </div>
+                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="box-body">
+                                        <div class="row">
+                                          <div *ngIf="chartoutg">
+                                            <canvas id="canva">{{ chartoutg}}</canvas>
+                                          </div>
+                                          </div>
+                                          
+                                          </div>
+                                        
+                                        </div>
+                                      
                                       </div>
                                     
                                 </div>
@@ -294,18 +343,18 @@
                                           <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
                                         </div>
                                       </div>
-                                      <!-- /.box-header -->
+                                  
                                       <div class="box-body">
                                         <div class="row">
-                                          <div *ngIf="chart">
-                                            <canvas id="canvas">{{ chart }}</canvas>
+                                          <div *ngIf="chartmiss">
+                                            <canvas id="canvasmiss">{{ chartmiss }}</canvas>
                                           </div>
                                           </div>
                                           
                                           </div>
-                                          <!-- /.col -->
+                                    
                                         </div>
-                                        <!-- /.row -->
+                                      
                                       </div>
                                     
                                 </div>
@@ -313,7 +362,7 @@
                                   <div class="col-md-12">
                                     <div class="box">
                                       <div class="box-header with-border">
-                                        <h3 class="box-title"><b>Top Outgoing Call Performer</b></h3>
+                                        <h3 class="box-title"><b>Number of Calls per user</b></h3>
                           
                                         <div class="box-tools pull-right">
                                           <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -332,60 +381,21 @@
                                           <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
                                         </div>
                                       </div>
-                                      <!-- /.box-header -->
+                                      
                                       <div class="box-body">
                                         <div class="row">
-                                          <div *ngIf="chartoutg">
-                                            <canvas id="canva">{{ chartoutg}}</canvas>
+                                          <div *ngIf="chartstack">
+                                            <canvas id="canvasstack">{{ chartstack }}</canvas>
                                           </div>
                                           </div>
                                           
                                           </div>
-                                          <!-- /.col -->
+                                      
                                         </div>
-                                        <!-- /.row -->
+                                        
                                       </div>
                                     
                                 </div>
-                                <div class="row">
-                                  <div class="col-md-12">
-                                    <div class="box">
-                                      <div class="box-header with-border">
-                                        <h3 class="box-title"><b>Number of Calls Per Date</b></h3>
-                          
-                                        <div class="box-tools pull-right">
-                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                                          </button>
-                                          <div class="btn-group">
-                                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
-                                              <i class="fa fa-wrench"></i></button>
-                                            <ul class="dropdown-menu" role="menu">
-                                              <li><a href="#">Action</a></li>
-                                              <li><a href="#">Another action</a></li>
-                                              <li><a href="#">Something else here</a></li>
-                                              <li class="divider"></li>
-                                              <li><a href="#">Separated link</a></li>
-                                            </ul>
-                                          </div>
-                                          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                                        </div>
-                                      </div>
-                                      <!-- /.box-header -->
-                                      <div class="box-body">
-                                        <div class="row">
-                                          <div *ngIf="chartdate">
-                                            <canvas id="canvasdate">{{ chartdate}}</canvas>
-                                          </div>
-                                          </div>
-                                          
-                                          </div>
-                                          <!-- /.col -->
-                                        </div>
-                                        <!-- /.row -->
-                                      </div>
-                                    
-                                </div>
-
                                 <section class="content">
                                   <div class="row">
                                     <div class="col-xs-12">
@@ -415,15 +425,14 @@
                                               
                                               
                                               <th class="sorting_asc" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending" aria-sort="ascending" style="width: 182px;">User</th>
-                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 224px;">ContactName</th>
-                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending" style="width: 199px;">FromNumber(s)</th>
-                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending" style="width: 156px;">ToNumber</th>
-                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Duration(sec)</th>
-                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Activity</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 224px;">PartnerMobile</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending" style="width: 199px;">UserMobile</th>
+                                              <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">CallStatus</th>
 
                                               <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Time</th>
                                               <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">Date</th>
                                               <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">note</th>
+
                                               <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 112px;">AudioLink</th>
 
                                               
@@ -432,18 +441,18 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                                <tr *ngFor= "let post of filteredCalls | paginate: { id: 'listing_pagination',
-                                                itemsPerPage: 10,
+                                                <tr *ngFor= "let post of filterData | paginate: { id: 'listing_pagination',
+                                                itemsPerPage: 50,
                                                 currentPage: page,
                                                 totalItems: totalRec } |filter:term">
-                                                    <td>{{post.User}}</td>
-                                                    <td>{{post.ContactName}}</td>
-                                                    <td>{{post.FromNumber }}</td>
-                                                    <td>{{post.ToNumber}}</td>
-                                                    <td>{{post.CallLength}}</td>
-                                                    <td>{{post.Activity}}</td>
-                                                   <td>{{post.Timestamp*1000 |date: 'h:mm:ss a'}}</td> 
-                                                  <td>{{post.Timestamp*1000 |date:'dd/MM/yyyy' }} </td>
+                                                    <td>{{post.user_id}}</td>
+                                                    <td>{{post.partner_mobile}}</td>
+                                                    <td>{{post.user_mobile}}</td>
+                                        
+                                                    
+                                                    <td>{{post.call_status}}</td>
+                                                  <td>{{post.call_started_at.split("T")[0]}}</td>
+                     <td>{{post.call_started_at.split("T")[1].split(".000Z")}}</td>
                                                   <td><button mat-button (click)="openDialog(post.notes)"><i class="material-icons">
                                                     description
                                                     </i></button></td>
@@ -462,7 +471,7 @@
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <audio controls>
-                                                                        <source src=  {{post.url}} />
+                                                                        <source src=  {{post.call_audio}} />
                                                                         </audio>
                                                                       
                                                                 </div>

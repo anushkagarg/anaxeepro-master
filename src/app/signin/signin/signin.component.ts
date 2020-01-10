@@ -46,6 +46,12 @@ export class SigninComponent implements OnInit {
      this.showMessage('danger', err.message));
   // }
 }
+logout(){
+  this.authService.logout();
+}
+isLoggedIn(){
+  return this.authService.isLoggedIn();
+}
   ngOnInit() {
   }
 

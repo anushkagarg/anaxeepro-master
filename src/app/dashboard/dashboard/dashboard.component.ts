@@ -1,18 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Pipe, PipeTransform } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
+import { HttpResponse, HttpClient } from '@angular/common/http';
+import { Http } from '@angular/http';
 import * as _ from 'lodash';
-import { DatePipe } from '@angular/common';
-import * as Moment from 'moment';
+import { FormControl } from '@angular/forms';
+import * as moment from 'moment';
 import * as Chart from 'chart.js';
-import { extendMoment } from 'moment-range';
 import { MydialogComponent } from 'src/app/mydialog/mydialog.component';
 import {MatDialog} from '@angular/material';
-// import moment = require('moment');
-// import 'chartjs-plugin-datalabels';
-
+import { Subscription, Subject } from 'rxjs';
+import { extendMoment } from 'moment-range';
+import { take, takeUntil } from 'rxjs/operators';
 
 class DateRange {
   startDate: Date;
@@ -26,17 +24,27 @@ class DateRange {
   }
 }
 
-export interface Call {
-  Activity: string;
-  ContactName: string;
-  CallLength: number;
-  FromNumber: string;
-  ToNumber: string;
-  User: string;
-  Timestamp: number;
-  url: string;
+export interface Data {
+  call_status: string;
+  partner_mobile: string;
+  user_mobile: string;
+  created_at: string;
+  call_ended_at: string;
+  call_started_at: string;
+  user_id: string;
 }
-
+interface Filter {
+  call_status?: string;
+  partner_mobile?: string;
+  user_mobile?: string;
+  created_at?: string;
+  call_ended_at?: string;
+  call_started_at?: string;
+  user_id?: string;
+}
+interface Response {
+  data: Data[];
+}
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -44,39 +52,31 @@ export interface Call {
 })
 
 export class DashboardComponent implements OnInit, OnDestroy {
-  callsCol: AngularFirestoreCollection<Call>;
-  calls: Observable<Call[]>;
-  allCalls: Call[];
-  filteredCalls: Call[];
-  missedCalls: Call[];
-  rejectedCalls: Call[];
-  incomingCalls: Call[];
-  outgoingCalls: Call[];
-  totalCallLength: string;
-  timeString; productive; unique; dayString; inco; miss; outg; rejc; total; query: string;
-  uniqueInco; uniqueOutg; uniqueMiss; uniqueRejc;
-  filteredNumber: string[];
-  filteredType: string[];
-  term; page: number; totalRec;
-  filteredUser: string[];
-  selectedUser: string[] = [];
-  selectedNumber: string;
-  selectedType: string;
+  filters: Filter = {};
+  userList: Data[];
+  filteredUsers = []; selectedUser: any;
+  filteredNumber: string[]; selectedNumber: any;
+  subscription: Subscription;
+  allUser; term; nom;
+  users: any[]; 
+  page: any = 0; filterData;
+  pageNumber; query: string;
+  pageSize; selectedType: string;  filteredType = [];
   selectedDaterange: any = new DateRange();
-  showCall: boolean;
-  nums: string[];
-  dates: any[] = [];
-  users: string[] = [];
-  types: string[];
-  ctx; myBarChart; chart; chartstack; chartoutg; chartdate; chartunique; ab;bc;
-  missedCallsDataset: number[];
-  rejectedCallsDataset: number[];
-  incomingCallsDataset: number[];
-  outgoingCallsDataset: number[];
+  localNumber: any; ab; bc; localUser: any;
+  incomingCount; outgoingCount; missedCount; totalCount; rejectedCount; charttotal;
+  incomingCalls; chartdate; outgoingCalls; chartoutg; missedCalls; rejectedCalls;
+  chartmiss; chartstack;
+  outgoingCallsDataset;
+  missedCallsDataset;
+  num: string[]; showCall: boolean;
+  uniqueInco; uniqueOutg; uniqueMiss; uniqueRejc; chartunique;
 
+  constructor(private httpClient: HttpClient, public dialog: MatDialog) { }
   queryChange = _.debounce(() => {
     // tslint:disable-next-line:variable-name
-    this.filteredNumber = this.nums.filter(number => number.includes(this.query));
+    console.log('called');
+    this.filteredNumber = this.num.filter(number => number.includes(this.query));
     if (this.filteredNumber.length) {
       this.selectedNumber = this.filteredNumber[0];
       this.filterData();
@@ -84,82 +84,126 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.showCall = false;
     }
   }, 500);
-  charttotal: Chart;
 
-  constructor(private afs: AngularFirestore, public dialog: MatDialog) { }
 
   ngOnInit() {
     window.dispatchEvent(new Event('resize'));
     document.body.className = 'hold-transition skin-blue sidebar-mini';
-    this.callsCol = this.afs.collection<Call>('callrecords');
-    this.callsCol.valueChanges().subscribe(b => {
-      this.allCalls = b;
-      this.filterData();
-      const fromNums = b.map((nums: Call) => nums.FromNumber);
-      const toNums = b.map((nums: Call) => nums.ToNumber);
-      this.nums = Array.from(new Set([...fromNums, ...toNums]));
-      this.filteredNumber = this.nums;
-      
-      let set = Array.from(new Set(b.map((users: Call) => users.User)));
-      this.users = [...set];
-      this.filteredUser = this.users;
-
-      set = Array.from(new Set(b.map((types: Call) => types.Activity)));
-      this.types = [...set];
-      this.filteredType = this.types;
+    this.defaultData();
+    this.filteredType = ['Incoming', 'Outgoing', 'Missed'];
+  }
+    
+  defaultData() {
+    let date: any = new Date();
+    date = moment(date).format('YYYY-MM-DD');
+    this.httpClient.get('https://crm.anaxee.com:3000/call_log', {
+      params: {
+        filter: '[["call_started_at",">","' + date + '"]]',
+        pageNumber: this.page,
+        pageSize: '300'
+      },
+      observe: 'response'
+    }).subscribe((res: HttpResponse<Response>) => {
+      this.filterData = res.body.data;
+      this.setCallsByStatus();
+      this.setCallsByStatusCount();
     });
   }
 
-  filterData() {
-    this.filteredCalls = this.selectedUser.length ?
-      this.allCalls.filter(call => this.selectedUser.includes(call.User)) : this.allCalls;
-    this.filteredCalls = this.selectedNumber ? this.filteredCalls.filter(call =>
-      call.FromNumber === this.selectedNumber || call.ToNumber === this.selectedNumber) : this.filteredCalls;
-    this.filteredCalls = this.selectedType ? this.filteredCalls.filter(call => call.Activity === this.selectedType) :
-      this.filteredCalls;
-
-    this.ab = this.selectedDaterange.endDate;
-    const endDate = (this.ab.valueOf() / 1000) + 86399; //timestamp
-    this.bc = this.selectedDaterange.startDate;
-    const startDate = this.bc.valueOf() / 1000;
-
-    let d: any = JSON.stringify(this.ab);
-    d = d.slice(1,11);
-    let de: any = JSON.stringify(this.bc);
-    de = de.slice(1, 11);
-
-    this.filteredCalls = this.filteredCalls.filter(call => Number(call.Timestamp) >= startDate
-      && Number(call.Timestamp) <= endDate);
-    
-    this.setCallsByType();
-    this.setCount();
-    this.missGraph();
-    this.outgoingGraph();
-    this.stackedgraph();
-    this.dateGraph();
-    this.chartUnique();
-    this.chartTotal();
-};
-  setCount() {
-    this.inco = this.incomingCalls.length;
-    this.outg = this.outgoingCalls.length;
-    console.log(this.inco, this.outg);
-    this.miss = this.missedCalls.length;
-    this.rejc = this.rejectedCalls.length;
-    this.total = this.inco + this.outg + this.miss + this.rejc;
-    this.productive = this.filteredCalls.filter(call => call.CallLength >= 10).length;
-    let second = this.filteredCalls.reduce((total, call) => total + Number(call.CallLength), 0);
-    this.totalCallLength = new Date(second * 1000).toISOString().substr(11, 8);
+  setCallsByStatusCount() {
+    this.outgoingCount = this.outgoingCalls.length;
+    this.incomingCount = this.incomingCalls.length;
+    this.missedCount = this.missedCalls.length;
+    this.rejectedCount = this.rejectedCalls.length;
+    this.totalCount = this.outgoingCount + this.incomingCount + this.missedCount + this.rejectedCount;
+    this.uniqueOutg =  [...new Set(this.outgoingCalls.map(call => call.partner_mobile))].length;
+    this.uniqueInco = [...new Set(this.incomingCalls.map(call => call.partner_mobile))].length;
+    this.uniqueMiss = [...new Set(this.missedCalls.map(call => call.partner_mobile))].length;
+    this.uniqueRejc =  [...new Set(this.rejectedCalls.map(call => call.partner_mobile))].length;
   }
-  setCallsByType() {
-    this.incomingCalls = this.filteredCalls.filter(call => call.Activity === 'Incoming');
-    this.outgoingCalls = this.filteredCalls.filter(call => call.Activity === 'Outgoing');
-    this.missedCalls = this.filteredCalls.filter(call => call.Activity === 'Missed');
-    this.rejectedCalls = this.filteredCalls.filter(call => call.Activity === 'Rejected');
-    this.uniqueOutg =  [...new Set(this.outgoingCalls.map(call => call.ToNumber))].length;
-    this.uniqueInco = [...new Set(this.incomingCalls.map(call => call.FromNumber))].length;
-    this.uniqueMiss = [...new Set(this.missedCalls.map(call => call.FromNumber ))].length;
-    this.uniqueRejc = [...new Set(this.rejectedCalls.map(call => call.ToNumber))].length;
+  setCallsByStatus() {
+    this.incomingCalls = this.filterData.filter(a => a.call_status == 'Incoming');
+    this.outgoingCalls = this.filterData.filter(a => a.call_status == 'Outgoing');
+    this.missedCalls = this.filterData.filter(a => a.call_status == 'Missed');
+    this.rejectedCalls = this.filterData.filter(a => a.call_status == 'Rejected');
+    // let calllength = this.filterData.filter(a => a.call_started_at.split('T'));
+  
+    this.chartTotal();
+    this.chartUnique();
+    this.outgoingGraph();
+    this.missGraph();
+    this.stackedGraph();
+  }
+  doApiCall() {
+    const filter = this.convertFilterToParam();
+    this.httpClient.get('https://crm.anaxee.com:3000/call_log', {
+      params: {
+        filter,
+        pageNumber: this.page,
+        pageSize: '300',
+      },
+      observe: 'response'
+    }).subscribe((res: HttpResponse<Response>) => {
+      this.filterData = res.body.data;
+      this.getData();
+      this.setCallsByStatusCount();
+      this.setCallsByStatus();
+    });
+  }
+  doFilterApiCall() {
+    const filter = this.convertFilterToParam();
+    this.httpClient.get('https://crm.anaxee.com:3000/call_log', {
+      params: {
+        // filter: '[["partner_mobile","=","' + this.selectedUser + '"]]',
+        filter,
+        pageNumber: this.page,
+        pageSize: '300',
+      },
+      observe: 'response'
+    }).subscribe((res: HttpResponse<Response>) => {
+      this.filterData = res.body.data;
+      this.setCallsByStatusCount();
+      this.setCallsByStatus();
+    });
+  }
+  handleSelectedTypeChange() {
+    this.filters.call_status = `"=","${this.selectedType}"`;
+    this.doFilterApiCall();
+  }
+  handleSelectedUserChange() {
+    this.filters.user_id = `"=","${this.selectedUser}"`;
+    this.doFilterApiCall();
+  }
+handleSelectedNumberChange() {
+  this.filters.partner_mobile = `"in",["${this.selectedNumber.join('","')}"]`;
+  this.doFilterApiCall();
+}
+getData() {
+  const numbers: string = this.filterData.map(a => a.partner_mobile);
+  this.num = [...new Set(numbers)];
+  this.filteredNumber = this.num.filter(Number);
+  localStorage.setItem('dataSource', JSON.stringify(this.filteredNumber));
+  // // tslint:disable-next-line:no-non-null-assertion
+  this.localNumber = JSON.parse(localStorage.getItem('dataSource'));
+
+  const users = this.filterData.map(a => a.user_id);
+  this.filteredUsers = [...new Set(users)];
+  localStorage.setItem('userlist', JSON.stringify(this.filteredUsers));
+  this.localUser = JSON.parse(localStorage.getItem('userlist'));
+}
+
+handleSelectedDateChange() {
+  this.bc = this.selectedDaterange.startDate;
+  const startDate = moment(this.bc).format('YYYY-MM-DD');
+  this.ab = this.selectedDaterange.endDate;
+  const endDate = moment(this.ab).format('YYYY-MM-DD');
+  this.filters.call_started_at = `">","${startDate}"`;
+  this.filters.call_ended_at = `"<","${endDate}T23:00:00.00Z"`;
+  this.doApiCall();
+}
+  convertFilterToParam() {
+    const { filters } = this;
+    return '[' + Object.keys(filters).map(key => `["${key}", ${filters[key]}]`).toString() + ']';
   }
   openDialog(post) {
     console.log('called');
@@ -170,23 +214,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog closed: ${result}`);
       const re = result;
-      console.log('heur', re);
     });
-  }
+  } 
   outgoingGraph() {
     if (this.chartoutg) {
       this.chartoutg.destroy();
       }
     const outgoingCount = {};
     this.outgoingCalls.forEach(call => {
-      outgoingCount[call.User] = (outgoingCount[call.User] || 0) + 1;
+      outgoingCount[call.user_id] = (outgoingCount[call.user_id] || 0) + 1;
     });
-    this.outgoingCallsDataset = this.users.map(User => outgoingCount[User] || 0);
-
+    this.outgoingCallsDataset = this.filteredUsers.map(us => outgoingCount[us] || 0);
     this.chartoutg = new Chart('canva', {
       type: 'bar',
       data: {
-        labels: this.users,
+        labels: this.localUser,
         datasets: [
           {
             data: this.outgoingCallsDataset,
@@ -208,19 +250,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   missGraph() {
-    if (this.chart) {
-      this.chart.destroy();
+    if (this.chartmiss) {
+      this.chartmiss.destroy();
       }
     const missedCount = {};
     this.missedCalls.forEach(call => {
-      missedCount[call.User] = (missedCount[call.User] || 0) + 1;
+      missedCount[call.user_id] = (missedCount[call.user_id] || 0) + 1;
     });
-    this.missedCallsDataset = this.users.map(User => missedCount[User] || 0);
+    this.missedCallsDataset = this.filteredUsers.map(s => missedCount[s] || 0);
 
-    this.chart = new Chart('canvas', {
+    this.chartmiss = new Chart('canvasmiss', {
       type: 'bar',
       data: {
-        labels: this.users,
+        labels: this.filteredUsers,
         datasets: [
           {
             data: this.missedCallsDataset,
@@ -241,30 +283,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  
-  stackedgraph() {
+  stackedGraph() {
     if (this.chartstack) {
       this.chartstack.destroy();
       }
     const incomingCount = {};
     this.incomingCalls.forEach(call => {
-      incomingCount[call.User] = (incomingCount[call.User] || 0) + 1;
+      incomingCount[call.user_id] = (incomingCount[call.user_id] || 0) + 1;
     });
-    this.incomingCallsDataset = this.users.map(User => incomingCount[User] || 0);
+    const incomingCallsDataset = this.filteredUsers.map(User => incomingCount[User] || 0);
 
     const rejectedCount = {};
     this.rejectedCalls.forEach(call => {
-      rejectedCount[call.User] = (rejectedCount[call.User] || 0) + 1;
+      rejectedCount[call.user_id] = (rejectedCount[call.user_id] || 0) + 1;
     });
-    this.rejectedCallsDataset = this.users.map(User => rejectedCount[User] || 0);
+    const rejectedCallsDataset = this.filteredUsers.map(User => rejectedCount[User] || 0);
 
-    this.chartstack = new Chart('canvass', {
+    this.chartstack = new Chart('canvasstack', {
       type: 'bar',
       data: {
-        labels: this.users,
+        labels: this.filteredUsers,
         datasets: [
           {
-            data: this.incomingCallsDataset,
+            data: incomingCallsDataset,
             backgroundColor: '#3cba9f',
             label: 'Incoming'
           },
@@ -279,7 +320,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             label: 'Missed'
           },
           {
-            data: this.rejectedCallsDataset,
+            data: rejectedCallsDataset,
             backgroundColor: '#ff8214',
             label: 'Rejected'
           },
@@ -334,7 +375,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
     }
     });
-  }
+  } 
   chartTotal() {
     if (this.charttotal) {
       this.charttotal.destroy();
@@ -345,7 +386,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         labels: ['Incoming', 'Outgoing', 'Missed', 'Rejected'],
         datasets: [{
           label: 'Total Calls Count',
-            data: [this.inco, this.outg, this.miss, this.rejc],
+            data: [this.incomingCount, this.outgoingCount, this.missedCount, this.rejectedCount],
             backgroundColor: [
                 'rgb(204, 51, 153)',
                 'rgb(204, 51, 153)',
@@ -378,40 +419,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   dateGraph() {
-    
-    let d: any = JSON.stringify(this.ab);
-    d = d.slice(1,11);
+    let firstDate: any = JSON.stringify(this.ab);
+    firstDate = firstDate.slice(1,11);
     const dateUser: any[] = [];
-    let de: any = JSON.stringify(this.bc);
-    de = de.slice(1, 11);
-    const moment = extendMoment(Moment);
-    const range = moment.range(de, d);
-    const array : any = Array.from(range.by('days'));
+    let secondDate: any = JSON.stringify(this.bc);
+    secondDate = secondDate.slice(1, 11);
+    const momen = extendMoment(moment);
+    const range = momen.range(secondDate, firstDate);
+    console.log('datess', range);
+    const array: any = Array.from(range.by('days'));
     array.map(m => {
       let dat = m.format('DD/MM/YYYY') ;
       dateUser.push(dat);
     });
     const incomingCount = {};
     this.incomingCalls.forEach(call => {
-      const date = this.timestampToDate(Number(call.Timestamp));
-      incomingCount[date] = (incomingCount[date]|| 0) + 1;
+      const date = this.timestampToDate(Number(call.call_started_at));
+      incomingCount[date] = (incomingCount[date] || 0) + 1;
     });
-    this.incomingCallsDataset = dateUser.map(date => incomingCount[date] || 0);
-
-    const outgoingCount = {};
-    this.outgoingCalls.forEach(call => {
-      const date = this.timestampToDate(Number(call.Timestamp));
-      outgoingCount[date] = (outgoingCount[date]|| 0) + 1;
-    });
-    console.log(outgoingCount);
-    this.outgoingCallsDataset = dateUser.map(date => outgoingCount[date] || 0);
-
-    const missedCount = {};
-    this.missedCalls.forEach(call => {
-         const date = this.timestampToDate(Number(call.Timestamp));
-         missedCount[date] = (missedCount[date] || 0) + 1;
-       });
-    this.missedCallsDataset = dateUser.map(date => missedCount[date] || 0);
+    const incomingCallsDataset = dateUser.map(date => incomingCount[date] || 0);
    
     if (this.chartdate) {
       this.chartdate.destroy();
@@ -422,20 +448,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
         labels: dateUser,
         datasets: [
           {
-            data: this.incomingCallsDataset,
+            data: incomingCallsDataset,
             backgroundColor: '#1491ff',
             label: 'Incoming'
           },
-          {
-            data: this.outgoingCallsDataset,
-            backgroundColor: '#ec03fc',
-            label: 'Outgoing'
-          },
-          {
-            data: this.missedCallsDataset,
-            backgroundColor: '#05e7f7',
-            label: 'Missed'
-          },
+          // {
+          //   data: this.outgoingCallsDataset,
+          //   backgroundColor: '#ec03fc',
+          //   label: 'Outgoing'
+          // },
+          // {
+          //   data: this.missedCallsDataset,
+          //   backgroundColor: '#05e7f7',
+          //   label: 'Missed'
+          // },
         ]
       },
       options: {
@@ -447,18 +473,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
   timestampToDate(timestamp) {
-   return Moment.unix(timestamp).format('DD/MM/YYYY');
+   return moment(timestamp).format('DD/MM/YYYY');
   }
-  reset() {
-    this.filterData();
-  }
- 
-  /*selectAll(select: NgModel, values, array) {
-    select.update.emit(values); 
-  }
-  deselectAll(select: NgModel) {
-    select.update.emit([]); 
-  }*/
 
   ngOnDestroy(): void {
     document.body.className = '';

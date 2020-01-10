@@ -8,6 +8,7 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFirestore, AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import {AuthService} from '../app/services/auth.service';
+import {AuthGuard} from '../app/services/auth.guard';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SigninModule } from './signin/signin.module';
@@ -18,32 +19,27 @@ import {MatSelectModule} from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import {PushNotificationsModule} from 'ng-push';
-import { StackedchartComponent } from './stackedchart/stackedchart.component';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
-import {UserhomeModule } from './userhome/userhome.module';
-import {UserlayoutModule } from './userlayout/userlayout.module';
 import { ReminderComponent } from './reminder/reminder.component';
 import {ToastrModule} from 'ngx-toastr';
-import { UserhomeComponent } from './userhome/userhome.component';
 import {NgxPaginationModule} from 'ngx-pagination';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
-import { UserdialogComponent } from './userdialog/userdialog.component';
-
-// import { DocPipe } from './doc.pipe';
+import { HttpModule} from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 @NgModule({
   declarations: [
     AppComponent,
-    StackedchartComponent,
     ReminderComponent,
-    UserhomeComponent,
-    UserdialogComponent,
-  //  DocPipe
   ],
   imports: [
     BrowserModule,
     ToastrModule.forRoot(),
     AngularFontAwesomeModule,
+    NgxMatSelectSearchModule,
     ReactiveFormsModule,
+    HttpClientModule,
+    HttpModule,
     MatDialogModule,
     AppRoutingModule,
     SigninModule,
@@ -60,10 +56,7 @@ import { UserdialogComponent } from './userdialog/userdialog.component';
     AngularFireAuthModule,
     BrowserAnimationsModule,
     PushNotificationsModule,
-    UserhomeModule,
-    UserlayoutModule
   ],
-  entryComponents: [ UserdialogComponent],
   providers: [AuthService, AngularFirestore],
   bootstrap: [AppComponent]
 })

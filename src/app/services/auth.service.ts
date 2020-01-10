@@ -10,7 +10,8 @@ import { Observable } from 'rxjs/Observable';
 export class AuthService {
 
   public user: Observable<firebase.User>;
-  public userDetails: firebase.User = undefined;
+ // public userDetails: firebase.User = undefined;
+  public userDetails: firebase.User = null;
   // tslint:disable-next-line:variable-name
   constructor(private _firebaseAuth: AngularFireAuth, private router: Router) {
         this.user = _firebaseAuth.authState;
@@ -21,7 +22,8 @@ export class AuthService {
               this.userDetails = user;
               console.log(this.userDetails.email, this.isLoggedIn());
             } else {
-              this.userDetails = undefined;
+              // this.userDetails = undefined;
+              this.userDetails = null;
             }
           }
         );
@@ -37,11 +39,12 @@ signInRegular(email, password) {
   return this._firebaseAuth.auth.signInWithEmailAndPassword(email, password);
 }
 
+
 isLoggedIn() {
-if (this.userDetails ) {
-    return true;
-  } else {
+if (this.userDetails == null ) {
     return false;
+  } else {
+    return true;
   }
 }
 

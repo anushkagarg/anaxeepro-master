@@ -12,7 +12,7 @@ import { SlickCarouselModule } from 'ngx-slick-carousel';
     CommonModule,
     SigninRoutingModule,
     SlickCarouselModule,
-    FormsModule,ReactiveFormsModule
+    FormsModule, ReactiveFormsModule
   ]
 })
 export class SigninModule { }

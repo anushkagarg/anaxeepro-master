@@ -6,14 +6,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { LayoutModule } from '../layout/layout.module';
 import { MatButtonModule, MatCardModule, MatIconModule, MatTableModule, MatFormFieldModule, MatOptionModule  } from '@angular/material';
 import {MatSelectModule} from '@angular/material/select';
-import {FormsModule} from '@angular/forms';
-import {DatePipe} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import {NgxPaginationModule} from 'ngx-pagination';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import {MydialogComponent} from '../mydialog/mydialog.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+
 
 @NgModule({
   declarations: [DashboardComponent, MydialogComponent],
@@ -21,8 +22,10 @@ import {MatDialogModule} from '@angular/material/dialog';
     CommonModule,
     MatDialogModule,
     NgxPaginationModule,
+    NgxMatSelectSearchModule,
     AngularFontAwesomeModule,
     DashboardRoutingModule,
+    ReactiveFormsModule,
     LayoutModule,
     Ng2SearchPipeModule,
     NgxDaterangepickerMd.forRoot(),
@@ -32,6 +35,6 @@ import {MatDialogModule} from '@angular/material/dialog';
        MatFormFieldModule, MatOptionModule, MatSelectModule
   ],
   entryComponents: [MydialogComponent],
-  providers: [DatePipe]
+  providers: []
 })
 export class DashboardModule { }

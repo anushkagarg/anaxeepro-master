@@ -28,7 +28,7 @@
     "angularfire2": "^5.2.1",
     "firebase": "^7.2.3",
     "hammerjs": "^2.0.8",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "moment-range": "^4.0.2",
     "ng-chartjs": "^0.1.2",
     "ng-push": "^0.2.2",
